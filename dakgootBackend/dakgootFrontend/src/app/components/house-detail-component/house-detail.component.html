@@ -1,0 +1,16 @@
+<h2>House Details</h2>
+<button [routerLink]="['/']" class="back-button">Back</button>
+<button [routerLink]="['/update-house', house.id]" class="update-button">Update</button>
+<div class="house-details">
+  <p><strong>Address:</strong> {{ house.address }}</p>
+  <p><strong>Resident:</strong> {{ house.resident.name }}</p>
+  <p><strong>Email:</strong> {{ house.resident.email }}</p>
+  <p><strong>Phone:</strong> {{ house.resident.phone }}</p>
+  <h3>Gutters</h3>
+  <ul>
+    <li *ngFor="let gutter of house.gutters">
+      <p><strong>Comments:</strong> {{ gutter.comments }}</p>
+      <img *ngIf="gutter.photoUrl" [src]="gutter.photoUrl" alt="Gutter Photo" class="gutter-photo">
+    </li>
+  </ul>
+</div>

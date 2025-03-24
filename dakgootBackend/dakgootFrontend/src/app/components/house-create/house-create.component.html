@@ -1,0 +1,44 @@
+<h2>Create New House</h2>
+<button [routerLink]="['/']" class="back-button">Back</button>
+<form [formGroup]="houseForm" (ngSubmit)="onSubmit()" class="create-form">
+  <div>
+    <label>Address:</label>
+    <input formControlName="address">
+    <div *ngIf="houseForm.get('address')?.invalid && houseForm.get('address')?.touched" class="error">
+      Address is required.
+    </div>
+  </div>
+  <div>
+    <label>Resident Name:</label>
+    <input formControlName="residentName">
+    <div *ngIf="houseForm.get('residentName')?.invalid && houseForm.get('residentName')?.touched" class="error">
+      Resident name is required.
+    </div>
+  </div>
+  <div>
+    <label>Resident Email:</label>
+    <input formControlName="residentEmail">
+    <div *ngIf="houseForm.get('residentEmail')?.invalid && houseForm.get('residentEmail')?.touched" class="error">
+      Valid email is required.
+    </div>
+  </div>
+  <div>
+    <label>Resident Phone:</label>
+    <input formControlName="residentPhone">
+    <div *ngIf="houseForm.get('residentPhone')?.invalid && houseForm.get('residentPhone')?.touched" class="error">
+      Phone number is required.
+    </div>
+  </div>
+  <div>
+    <label>Gutter Photo URL:</label>
+    <input formControlName="gutterPhotoUrl">
+  </div>
+  <div>
+    <label>Gutter Comments:</label>
+    <input formControlName="gutterComments">
+  </div>
+  <button type="submit" class="submit-button">Create House</button>
+  <div *ngIf="formError" class="form-error">
+    {{ formError }}
+  </div>
+</form>
