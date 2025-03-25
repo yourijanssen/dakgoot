@@ -1,10 +1,17 @@
 .house-details {
   max-width: 600px;
-  margin: 20px auto;
+  margin: 40px auto;
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 8px;
   background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.house-details h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
 }
 
 .house-details p {
@@ -26,6 +33,7 @@
   cursor: pointer;
   margin-bottom: 20px;
   margin-right: 10px;
+  transition: background-color 0.3s ease;
 }
 
 .back-button {

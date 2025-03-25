@@ -1,3 +1,22 @@
-<h1>Welcome to the House Management App</h1>
+<div class="app-container">
+  <nav class="navbar">
+    <div class="nav-left">
+      <a routerLink="/">Home</a>
+    </div>
+    <div class="nav-right">
+      <ng-container *ngIf="isLoggedIn; else loginButton">
+    <span class="user-info">
+      Welcome, {{ currentUser?.name }} ({{ currentUser?.role }})
+    </span>
+        <a routerLink="/logout" class="logout-button">Logout</a>
+      </ng-container>
+      <ng-template #loginButton>
+        <a routerLink="/login" class="login-button">Login</a>
+        <a routerLink="/register" class="register-button">Register</a>
+      </ng-template>
+    </div>
+  </nav>
+  <h1 class="title">Welcome to the House Management App</h1>
 
-<router-outlet></router-outlet>
+  <router-outlet></router-outlet>
+</div>

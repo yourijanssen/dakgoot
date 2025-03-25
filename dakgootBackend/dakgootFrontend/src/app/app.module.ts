@@ -11,6 +11,10 @@ import {AppRoutingModule} from "./app-routing.module";
 import { HouseCreateComponent } from './components/house-create/house-create.component';
 import {ReactiveFormsModule} from "@angular/forms";
 import { HouseUpdateComponent } from './components/house-update/house-update.component';
+import { LoginComponent } from './components/login/login.component';
+import { LogoutComponent } from './components/logout/logout.component';
+import { RegisterComponent } from './components/register/register.component';
+import { UserListComponent } from './components/user-list/user-list.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +24,10 @@ import { HouseUpdateComponent } from './components/house-update/house-update.com
     ResidentComponent,
     HouseCreateComponent,
     HouseUpdateComponent,
+    LoginComponent,
+    LogoutComponent,
+    RegisterComponent,
+    UserListComponent,
   ],
   imports: [
     BrowserModule,

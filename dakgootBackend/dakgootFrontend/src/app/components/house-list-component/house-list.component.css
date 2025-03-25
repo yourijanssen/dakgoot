@@ -1,38 +1,63 @@
-.house-list {
-  max-width: 600px;
-  margin: 20px auto;
+.list-container {
+  max-width: 800px;
+  margin: 40px auto;
   padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background-color: #f7f7f7;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.house-item {
+h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.button-group {
   display: flex;
-  align-items: center;
-  margin-bottom: 10px;
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
-.house-item a {
-  margin-right: 20px;
-}
-
-.create-button, .delete-button {
-  padding: 10px 15px;
+.action-button, .create-button, .delete-button {
+  padding: 10px 20px;
   background-color: #007bff;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-top: 10px;
+  margin: 0 10px;
+  transition: background-color 0.3s ease;
 }
 
-.create-button:hover {
+.action-button:hover, .create-button:hover {
   background-color: #0056b3;
 }
 
+.house-list {
+  margin-top: 20px;
+}
+
+.house-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.house-item a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.house-item a:hover {
+  text-decoration: underline;
+}
+
 .delete-button {
-  margin-left: auto;
   background-color: #dc3545;
 }
 

@@ -1,16 +1,17 @@
-<h2>Update House</h2>
-<button [routerLink]="['/']" class="back-button">Back</button>
-<form [formGroup]="houseForm" (ngSubmit)="onSubmit()" class="update-form">
-
-  <div formArrayName="gutters">
-    <div *ngFor="let gutter of gutters.controls; let i = index" [formGroupName]="i">
-      <label>Gutter Photo URL:</label>
-      <input formControlName="photoUrl">
-      <label>Gutter Comments:</label>
-      <input formControlName="comments">
-      <button type="button" (click)="removeGutter(i)">Remove</button>
+<div class="update-form-container">
+  <h2>Update House</h2>
+  <button [routerLink]="['/']" class="back-button">Back</button>
+  <form [formGroup]="houseForm" (ngSubmit)="onSubmit()" class="update-form">
+    <div formArrayName="gutters">
+      <div *ngFor="let gutter of gutters.controls; let i = index" [formGroupName]="i" class="gutter-group">
+        <label>Gutter Photo URL:</label>
+        <input formControlName="photoUrl">
+        <label>Gutter Comments:</label>
+        <input formControlName="comments">
+        <button type="button" (click)="removeGutter(i)" class="remove-button">Remove</button>
+      </div>
     </div>
-  </div>
-  <button type="button" (click)="addGutter()">Add Gutter</button>
-  <button type="submit" class="submit-button">Update House</button>
-</form>
+    <button type="button" (click)="addGutter()" class="add-button">Add Gutter</button>
+    <button type="submit" class="submit-button">Update House</button>
+  </form>
+</div>

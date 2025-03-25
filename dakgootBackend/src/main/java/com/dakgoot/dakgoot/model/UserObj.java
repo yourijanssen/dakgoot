@@ -1,27 +1,39 @@
 package com.dakgoot.dakgoot.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
+import java.util.Objects;
 
 @Entity
+@Table(name = "users", uniqueConstraints = {
+		@UniqueConstraint(columnNames = "email")
+})
 public class UserObj {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column
+	@Column(nullable = false)
 	private String name;
 
-	@Column
+	@Column(nullable = false, unique = true)
 	private String email;
 
-	@Column
+	@Column(nullable = false)
 	private String password;
 
+	@Column(nullable = false)
+	private String role = "USER"; // Default role
+
+	// Constructors
+	public UserObj() {}
+
+	public UserObj(String name, String email, String password) {
+		this.name = name;
+		this.email = email;
+		this.password = password;
+		this.role = "USER";
+	}
 
 	// Getters and Setters
 	public Long getId() {
@@ -56,13 +68,37 @@ public class UserObj {
 		this.password = password;
 	}
 
-	// toString method for easy printing
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+
+	// Equals and HashCode
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		UserObj userObj = (UserObj) o;
+		return Objects.equals(id, userObj.id) &&
+				Objects.equals(email, userObj.email);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, email);
+	}
+
+	// toString method
 	@Override
 	public String toString() {
 		return "UserObj{" +
 				"id=" + id +
 				", name='" + name + '\'' +
 				", email='" + email + '\'' +
+				", role='" + role + '\'' +
 				'}';
 	}
 }
