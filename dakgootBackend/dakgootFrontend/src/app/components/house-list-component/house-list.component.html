@@ -3,7 +3,7 @@
 <div class="house-list">
   <ul>
     <li *ngFor="let house of houses" class="house-item">
-      <a [routerLink]="['/house', house.id]">{{ house.address }}</a>
+      <a [routerLink]="['/house', house.id]">{{ house?.address }}</a>
       <button (click)="deleteHouse(house.id)" class="delete-button">Delete</button>
     </li>
   </ul>

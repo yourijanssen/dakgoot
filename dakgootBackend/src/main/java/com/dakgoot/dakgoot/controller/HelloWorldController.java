@@ -36,7 +36,7 @@ public class HelloWorldController {
 
 	@PutMapping("/update/{id}")
 	public String updateUser(@PathVariable Long id, @RequestBody UserObj user) {
-		UserObj updatedUser = userRepository.findById(Math.toIntExact(id)).orElse(null);
+		UserObj updatedUser = userRepository.findById((long) Math.toIntExact(id)).orElse(null);
 		if (updatedUser != null) {
 			updatedUser.setName(user.getName());
 			updatedUser.setEmail(user.getEmail());
@@ -50,7 +50,7 @@ public class HelloWorldController {
 
 	@DeleteMapping("/deleteUser/{id}")
 	public String deleteUser(@PathVariable Long id) {
-		UserObj deleteUser = userRepository.findById(Math.toIntExact(id)).orElse(null);
+		UserObj deleteUser = userRepository.findById((long) Math.toIntExact(id)).orElse(null);
 		if (deleteUser != null) {
 			userRepository.delete(deleteUser);
 			return "User with id: " + id + " deleted.";
