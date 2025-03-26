@@ -24,14 +24,6 @@ export enum UserRole {
   MAINTENANCE = 'MAINTENANCE',
 }
 
-export enum RepairRequestStatus {
-  PENDING = 'PENDING',
-  APPROVED = 'APPROVED',
-  IN_PROGRESS = 'IN_PROGRESS',
-  COMPLETED = 'COMPLETED',
-  REJECTED = 'REJECTED'
-}
-
 export interface User {
   id?: number;
   name: string;
@@ -91,6 +83,27 @@ export interface UserFilter {
   role?: UserRole;
 }
 
+export interface RepairRequest {
+  id?: number;
+  description: string;
+  repairType?: string;
+  status?: RepairRequestStatus;
+  photoUrl?: string;
+  comments?: string;
+  createdAt?: Date;
+  houseId?: number;
+  houseAddress?: string;
+  createdById?: number;
+  createdByName?: string;
+}
+
+export enum RepairRequestStatus {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  REJECTED = 'REJECTED'
+}
 export interface HouseFilter {
   address?: string;
   ownerId?: number;
@@ -235,15 +248,21 @@ export class MainService implements CanActivate {
     return this.http.get<House[]>(`${this.apiBaseUrl}/users/${this.getCurrentUser()?.id}/houses`);
   }
 
-  getHouse(id: string | null): Observable<House> {
+  getHouse(id: number): Observable<House> {
     return this.http.get<House>(`${this.apiBaseUrl}/houses/${id}`);
   }
+
 
 // In MainService
   createHouse(houseData: { address: string }): Observable<House> {
     const currentUser = this.getCurrentUser();
+
+    if (!currentUser) {
+      return throwError(() => new Error('User not logged in'));
+    }
+
     return this.http.post<House>(
-      `${this.apiBaseUrl}/users/${currentUser?.id}/houses`,
+      `${this.apiBaseUrl}/users/${currentUser.id}/houses`,
       houseData
     );
   }
@@ -278,13 +297,24 @@ export class MainService implements CanActivate {
   createRepairRequest(houseId: number, repairRequest: RepairRequest): Observable<RepairRequest> {
     const currentUser = this.getCurrentUser();
     return this.http.post<RepairRequest>(
-      `${this.apiBaseUrl}/houses/${houseId}/repair-requests?userId=${currentUser?.id}`,
+      `${this.apiBaseUrl}/house/${houseId}/repair-requests?userId=${currentUser?.id}`,
       repairRequest
     );
   }
 
   getHouseRepairRequests(houseId: number): Observable<RepairRequest[]> {
-    return this.http.get<RepairRequest[]>(`${this.apiBaseUrl}/houses/${houseId}/repair-requests`);
+    return this.http.get<RepairRequest[]>(`${this.apiBaseUrl}/house/${houseId}/repair-requests`);
+  }
+
+  updateRepairRequest(repairRequest: RepairRequest): Observable<RepairRequest> {
+    return this.http.put<RepairRequest>(
+      `${this.apiBaseUrl}/repair-requests/${repairRequest.id}`,
+      repairRequest
+    );
+  }
+
+  deleteRepairRequest(requestId: number): Observable<any> {
+    return this.http.delete(`${this.apiBaseUrl}/repair-requests/${requestId}`);
   }
 
   getUserRepairRequests(): Observable<RepairRequest[]> {

@@ -8,6 +8,8 @@ import { HomeownerDashboardComponent } from "./components/homeowner-dashboard/ho
 import { MainService } from "./services/main.service";
 import { CanActivate } from '@angular/router';
 import {AuthGuard} from "./services/auth.guard";
+import {HouseDetailComponent} from "./components/house-detail/house-detail.component";
+import {AddHouseComponent} from "./components/add-house/add-house.component";
 
 @Injectable({
   providedIn: 'root'
@@ -48,12 +50,22 @@ const routes: Routes = [
     component: HomeownerDashboardComponent
   },
   {
+    path: 'add-house',
+    component: AddHouseComponent,
+    canActivate: [AuthGuard]
+  },
+  {
     path: 'login',
     component: LoginComponent
   },
   {
     path: 'register',
     component: RegisterComponent
+  },
+  {
+    path: 'house/:id',
+    component: HouseDetailComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: 'logout',

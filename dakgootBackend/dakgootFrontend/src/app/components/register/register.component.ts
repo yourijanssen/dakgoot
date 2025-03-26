@@ -14,7 +14,7 @@ export class RegisterComponent {
 
   // Define available roles
   roles = [
-    { value: 'OWNER', label: 'Homeowner' },
+    { value: 'HOMEOWNER', label: 'Homeowner' },
     { value: 'ADMIN', label: 'Administrator' },
     { value: 'MAINTENANCE', label: 'Maintenance' }
   ];
@@ -42,7 +42,7 @@ export class RegisterComponent {
       phone: ['', [
         Validators.pattern(/^[0-9]{10}$/) // Basic 10-digit phone number validation
       ]],
-      role: ['OWNER', Validators.required] // Default role
+      role: ['HOMEOWNER', Validators.required] // Default role
     });
   }
 

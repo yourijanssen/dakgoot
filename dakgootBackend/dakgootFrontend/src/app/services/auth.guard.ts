@@ -1,4 +1,3 @@
-// auth.guard.ts
 import { Injectable } from '@angular/core';
 import {
   CanActivate,
@@ -6,7 +5,7 @@ import {
   RouterStateSnapshot,
   Router
 } from '@angular/router';
-import { MainService } from '../services/main.service';
+import { MainService } from './main.service';
 
 @Injectable({
   providedIn: 'root'
@@ -34,18 +33,33 @@ export class AuthGuard implements CanActivate {
       // Role-based access control
       switch (user.role) {
         case 'ADMIN':
-          // Admin can access admin dashboard
-          if (state.url === '/admin-dashboard') {
+          // Admin can access admin dashboard and all routes
+          if (state.url === '/admin-dashboard' ||
+            state.url.startsWith('/add-house') ||
+            state.url.startsWith('/house/')) {
             return true;
           }
           this.router.navigate(['/admin-dashboard']);
           return false;
 
         case 'HOMEOWNER':
-          // Homeowner can access home dashboard
-          if (state.url === '/home') {
+          // Homeowner can access home dashboard, add-house, and house details
+          const allowedRoutes = [
+            '/home',
+            '/add-house',
+            '/house/',
+            '/logout'
+          ];
+
+          const isAllowedRoute = allowedRoutes.some(route =>
+            state.url === route || state.url.startsWith(route)
+          );
+
+          if (isAllowedRoute) {
             return true;
           }
+
+          // If not an allowed route, redirect to home
           this.router.navigate(['/home']);
           return false;
 

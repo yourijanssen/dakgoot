@@ -6,16 +6,21 @@ import com.dakgoot.dakgoot.model.LoginRequest;
 import com.dakgoot.dakgoot.model.RepairRequest;
 import com.dakgoot.dakgoot.model.User;
 import com.dakgoot.dakgoot.modelDTO.HouseDTO;
+import com.dakgoot.dakgoot.modelDTO.RepairRequestDTO;
 import com.dakgoot.dakgoot.modelDTO.UserDTO;
 import com.dakgoot.dakgoot.repository.HouseRepository;
 import com.dakgoot.dakgoot.repository.RepairRequestRepository;
 import com.dakgoot.dakgoot.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -301,7 +306,160 @@ public class MainController {
 		return ResponseEntity.ok(houseDTOs);
 	}
 
+
+
 	// Repair Request Endpoints
+
+	@GetMapping("/repair-requests")
+	public ResponseEntity<List<RepairRequestDTO>> getAllRepairRequests() {
+		List<RepairRequest> repairRequests = repairRequestRepository.findAll();
+
+		List<RepairRequestDTO> repairRequestDTOs = repairRequests.stream()
+				.map(request -> {
+					RepairRequestDTO dto = new RepairRequestDTO.RepairRequestDTOBuilder()
+							.id(request.getId())
+							.description(request.getDescription())
+							.repairType(request.getRepairType())
+							.status(request.getStatus())
+//							.createdAt(request.getCreatedAt())
+							// Add house details
+							.houseId(request.getHouse() != null ? request.getHouse().getId() : null)
+							.houseAddress(request.getHouse() != null ? request.getHouse().getAddress() : null)
+							// Add creator details
+							.createdById(request.getCreatedBy() != null ? request.getCreatedBy().getId() : null)
+							.createdByName(request.getCreatedBy() != null ? request.getCreatedBy().getName() : null)
+							.build();
+
+					return dto;
+				})
+				.collect(Collectors.toList());
+
+		return ResponseEntity.ok(repairRequestDTOs);
+	}
+
+	@GetMapping("/houses/{id}")
+	public ResponseEntity<HouseDTO> getHouseDetails(@PathVariable Long id) {
+		// Find the house
+		House house = houseRepository.findById(id)
+				.orElse(null); // Simply return null if house not found
+
+		// Check if house exists
+		if (house == null) {
+			return ResponseEntity.notFound().build();
+		}
+
+		// Create a detailed HouseDTO
+		HouseDTO houseDTO = new HouseDTO.HouseDTOBuilder()
+				.id(house.getId())
+				.address(house.getAddress())
+				.ownerId(house.getOwner() != null ? house.getOwner().getId() : null)
+				.ownerName(house.getOwner() != null ? house.getOwner().getName() : null)
+				.ownerEmail(house.getOwner() != null ? house.getOwner().getEmail() : null)
+				.build();
+
+		// Map repair requests
+		List<RepairRequestDTO> repairRequestDTOs = house.getRepairRequests() != null ?
+				house.getRepairRequests().stream()
+						.map(repairRequest -> new RepairRequestDTO.RepairRequestDTOBuilder()
+								.id(repairRequest.getId())
+								.description(repairRequest.getDescription())
+								.repairType(repairRequest.getRepairType())
+								.status(repairRequest.getStatus())
+//								.createdAt(repairRequest.getCreatedAt())
+								.createdById(repairRequest.getCreatedBy() != null ?
+										repairRequest.getCreatedBy().getId() : null)
+								.createdByName(repairRequest.getCreatedBy() != null ?
+										repairRequest.getCreatedBy().getName() : null)
+								.build())
+						.collect(Collectors.toList())
+				: new ArrayList<>();
+
+		// Set repair requests in the DTO
+		houseDTO.setRepairRequests(repairRequestDTOs);
+
+		return ResponseEntity.ok(houseDTO);
+	}
+
+	@PostMapping("/repair-requests")
+	public ResponseEntity<RepairRequestDTO> createRepairRequest(
+			@Valid @RequestBody RepairRequestDTO repairRequestDTO,
+			@RequestParam Long houseId,
+			@RequestParam Long userId
+	) {
+		try {
+			// Find the house
+			House house = houseRepository.findById(houseId)
+					.orElseThrow(() -> new RuntimeException("House not found"));
+
+			// Find the user
+			User user = userRepository.findById(userId)
+					.orElseThrow(() -> new RuntimeException("User not found"));
+
+			// Create a new repair request
+			RepairRequest repairRequest = new RepairRequest();
+
+			// Set basic details from DTO
+			repairRequest.setDescription(repairRequestDTO.getDescription());
+			repairRequest.setRepairType(repairRequestDTO.getRepairType());
+
+			// Set default status if not provided
+			repairRequest.setStatus(
+					repairRequestDTO.getStatus() != null
+							? repairRequestDTO.getStatus()
+							: RepairRequest.RepairStatus.PENDING
+			);
+
+			// Set additional fields
+			repairRequest.setPhotoUrl(repairRequestDTO.getPhotoUrl());
+			repairRequest.setComments(repairRequestDTO.getComments());
+
+			// Set current timestamp if not provided
+//			repairRequest.setCreatedAt(
+//					repairRequestDTO.getCreatedAt() != null
+//							? repairRequestDTO.getCreatedAt()
+//							: LocalDateTime.now()
+//			);
+
+			// Set relationships
+			repairRequest.setHouse(house);
+			repairRequest.setCreatedBy(user);
+
+			// Save the repair request
+			RepairRequest savedRepairRequest = repairRequestRepository.save(repairRequest);
+
+			// Convert to DTO for response
+			RepairRequestDTO savedRepairRequestDTO = new RepairRequestDTO.RepairRequestDTOBuilder()
+					.id(savedRepairRequest.getId())
+					.description(savedRepairRequest.getDescription())
+					.repairType(savedRepairRequest.getRepairType())
+					.status(savedRepairRequest.getStatus())
+					.photoUrl(savedRepairRequest.getPhotoUrl())
+					.comments(savedRepairRequest.getComments())
+//					.createdAt(savedRepairRequest.getCreatedAt())
+					.houseId(house.getId())
+					.houseAddress(house.getAddress())
+					.createdById(user.getId())
+					.createdByName(user.getName())
+					.build();
+
+			return ResponseEntity.status(HttpStatus.CREATED).body(savedRepairRequestDTO);
+
+		} catch (Exception e) {
+			// Log the error
+			System.err.println("Error creating repair request: " + e.getMessage());
+
+			// Create an error response DTO
+			RepairRequestDTO errorDTO = new RepairRequestDTO.RepairRequestDTOBuilder()
+					.description("Error creating repair request: " + e.getMessage())
+					.build();
+
+			return ResponseEntity
+					.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body(errorDTO);
+		}
+	}
+
+
 	@PostMapping("/house/{houseId}/repair-requests")
 	public ResponseEntity<RepairRequest> createRepairRequest(
 			@PathVariable Long houseId,

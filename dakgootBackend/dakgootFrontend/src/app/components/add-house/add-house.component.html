@@ -1,0 +1,64 @@
+<div class="add-house-container">
+  <h2>Add New Property</h2>
+
+  <form [formGroup]="houseForm" (ngSubmit)="onSubmit()" class="house-form">
+    <!-- Address Input -->
+    <div class="form-group">
+      <label for="address">Property Address</label>
+      <input
+        id="address"
+        type="text"
+        formControlName="address"
+        placeholder="Enter full property address"
+      >
+
+      <!-- Validation Error Messages -->
+      <div
+        *ngIf="address?.invalid && (address?.dirty || address?.touched)"
+        class="error-messages"
+      >
+        <small *ngIf="address?.errors?.['required']">
+          Address is required
+        </small>
+        <small *ngIf="address?.errors?.['minlength']">
+          Address must be at least 5 characters
+        </small>
+        <small *ngIf="address?.errors?.['maxlength']">
+          Address cannot exceed 100 characters
+        </small>
+        <small *ngIf="address?.errors?.['invalidAddress']">
+          Please enter a valid address
+        </small>
+      </div>
+    </div>
+
+    <!-- Submit and Cancel Buttons -->
+    <div class="form-actions">
+      <button
+        type="submit"
+        class="submit-btn"
+        [disabled]="!(houseForm) || houseForm.invalid || isSubmitting"
+      >
+        {{ isSubmitting ? 'Adding...' : 'Add Property' }}
+      </button>
+      <button
+        type="button"
+        class="cancel-btn"
+        (click)="onCancel()"
+        [disabled]="isSubmitting"
+      >
+        Cancel
+      </button>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+  </form>
+
+  <!-- Back to Dashboard Link -->
+  <div class="back-link">
+    <a routerLink="/home">Back to Dashboard</a>
+  </div>
+</div>

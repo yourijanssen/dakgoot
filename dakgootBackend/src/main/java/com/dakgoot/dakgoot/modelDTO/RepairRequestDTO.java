@@ -1,5 +1,6 @@
 package com.dakgoot.dakgoot.modelDTO;
 
+import com.dakgoot.dakgoot.model.House;
 import com.dakgoot.dakgoot.model.RepairRequest;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -13,7 +14,7 @@ public class RepairRequestDTO {
 	@NotBlank(message = "Description is required")
 	@Size(min = 5, max = 500, message = "Description must be between 5 and 500 characters")
 	private String description;
-
+	private House house;
 	private String repairType;
 	private RepairRequest.RepairStatus status;
 	private String photoUrl;

@@ -1,21 +1,20 @@
 package com.dakgoot.dakgoot;
 
+import java.time.LocalDateTime;
+import java.util.Arrays;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
 import com.dakgoot.dakgoot.enums.UserRole;
 import com.dakgoot.dakgoot.model.House;
 import com.dakgoot.dakgoot.model.RepairRequest;
 import com.dakgoot.dakgoot.model.User;
 import com.dakgoot.dakgoot.repository.HouseRepository;
+import com.dakgoot.dakgoot.repository.RepairRequestRepository;
 import com.dakgoot.dakgoot.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-
-/**
- * Initializes the database with dummy data for users, houses, and repair requests.
- */
 @Component
 public class DataInitializer implements CommandLineRunner {
 
@@ -25,12 +24,9 @@ public class DataInitializer implements CommandLineRunner {
 	@Autowired
 	private HouseRepository houseRepository;
 
-	/**
-	 * Runs the data initialization process.
-	 *
-	 * @param args command line arguments
-	 * @throws Exception if an error occurs during initialization
-	 */
+	@Autowired
+	private RepairRequestRepository repairRequestRepository;
+
 	@Override
 	public void run(String... args) throws Exception {
 		// Only initialize if no users exist
@@ -60,22 +56,47 @@ public class DataInitializer implements CommandLineRunner {
 					"555-123-4567"
 			);
 
+			// Save users first to ensure they have IDs
+			userRepository.saveAll(Arrays.asList(homeowner1, homeowner2, maintenanceUser));
+
 			// Create houses for homeowners
 			House house1 = createHouse(
 					"123 Main St",
-					homeowner1,
-					createRepairRequest(homeowner1, "Gutter repair needed")
+					homeowner1
 			);
 
 			House house2 = createHouse(
 					"456 Elm St",
-					homeowner2,
-					createRepairRequest(homeowner2, "Roof leak")
+					homeowner2
 			);
 
-			// Save users and houses
-			userRepository.saveAll(Arrays.asList(homeowner1, homeowner2, maintenanceUser));
+			// Save houses
 			houseRepository.saveAll(Arrays.asList(house1, house2));
+
+			// Create and save repair requests
+			RepairRequest request1 = createRepairRequest(
+					homeowner1,
+					house1,
+					"Gutter repair needed",
+					"ROOFING"
+			);
+
+			RepairRequest request2 = createRepairRequest(
+					homeowner2,
+					house2,
+					"Roof leak in the attic",
+					"ROOFING"
+			);
+
+			RepairRequest request3 = createRepairRequest(
+					homeowner1,
+					house1,
+					"Electrical outlet not working",
+					"ELECTRICAL"
+			);
+
+			// Save repair requests
+			repairRequestRepository.saveAll(Arrays.asList(request1, request2, request3));
 		}
 	}
 
@@ -100,8 +121,7 @@ public class DataInitializer implements CommandLineRunner {
 	 */
 	private House createHouse(
 			String address,
-			User owner,
-			RepairRequest... repairRequests
+			User owner
 	) {
 		House house = new House();
 		house.setAddress(address);
@@ -110,27 +130,28 @@ public class DataInitializer implements CommandLineRunner {
 		// Add house to user's houses
 		owner.addHouse(house);
 
-		// Add repair requests
-		if (repairRequests != null && repairRequests.length > 0) {
-			Arrays.stream(repairRequests).forEach(request -> {
-				request.setHouse(house);
-				house.getRepairRequests().add(request);
-			});
-		}
-
 		return house;
 	}
 
 	/**
 	 * Create a repair request
 	 */
-	private RepairRequest createRepairRequest(User user, String description) {
+	private RepairRequest createRepairRequest(
+			User user,
+			House house,
+			String description,
+			String repairType
+	) {
 		RepairRequest request = new RepairRequest();
 		request.setDescription(description);
 		request.setCreatedBy(user);
+		request.setHouse(house);
 		request.setCreatedAt(LocalDateTime.now());
 		request.setStatus(RepairRequest.RepairStatus.PENDING);
-		request.setRepairType("MAINTENANCE");
+		request.setRepairType(repairType);
+
+		// Add repair request to house's repair requests
+		house.addRepairRequest(request);
 
 		return request;
 	}
