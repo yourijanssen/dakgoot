@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from "../../services/auth-service/auth-service.service";
+import { MainService } from "../../services/main.service";
 
 @Component({
   selector: 'app-register',
@@ -14,14 +14,14 @@ export class RegisterComponent {
 
   // Define available roles
   roles = [
-    { value: 'USER', label: 'Regular User' },
+    { value: 'OWNER', label: 'Homeowner' },
     { value: 'ADMIN', label: 'Administrator' },
-    { value: 'MANAGER', label: 'Manager' }
+    { value: 'MAINTENANCE', label: 'Maintenance' }
   ];
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService,
+    private mainService: MainService,
     private router: Router
   ) {
     this.registerForm = this.fb.group({
@@ -39,13 +39,25 @@ export class RegisterComponent {
         Validators.minLength(6),
         Validators.maxLength(50)
       ]],
-      role: ['USER', Validators.required] // Default role
+      phone: ['', [
+        Validators.pattern(/^[0-9]{10}$/) // Basic 10-digit phone number validation
+      ]],
+      role: ['OWNER', Validators.required] // Default role
     });
   }
 
   onSubmit() {
     if (this.registerForm.valid) {
-      this.authService.register(this.registerForm.value).subscribe({
+      // Create a copy of the form value to potentially modify phone
+      const registrationData = {...this.registerForm.value};
+
+      // Optional: Format phone number if provided
+      if (registrationData.phone) {
+        // Remove any non-digit characters
+        registrationData.phone = registrationData.phone.replace(/\D/g, '');
+      }
+
+      this.mainService.register(registrationData).subscribe({
         next: (response) => {
           if (response.success) {
             console.log(response.message);
@@ -65,5 +77,6 @@ export class RegisterComponent {
   get name() { return this.registerForm.get('name'); }
   get email() { return this.registerForm.get('email'); }
   get password() { return this.registerForm.get('password'); }
+  get phone() { return this.registerForm.get('phone'); }
   get role() { return this.registerForm.get('role'); }
 }

@@ -1,8 +1,8 @@
 package com.dakgoot.dakgoot.repository;
 
-import com.dakgoot.dakgoot.model.UserObj;
+import com.dakgoot.dakgoot.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository extends JpaRepository<UserObj, Long> {
-	UserObj findByEmail(String email);
+public interface UserRepository extends JpaRepository<User, Long> {
+	User findByEmail(String email);
 }

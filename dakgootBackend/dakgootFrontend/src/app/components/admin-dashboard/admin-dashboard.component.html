@@ -1,0 +1,133 @@
+<div class="admin-dashboard-container">
+  <h1>Admin Dashboard</h1>
+
+  <!-- Loading Indicator -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    Loading dashboard data...
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Dashboard Statistics -->
+  <div *ngIf="!isLoading && !errorMessage" class="dashboard-stats">
+    <div class="stat-card">
+      <h3>Total Users</h3>
+      <p class="stat-number">{{ userCount }}</p>
+    </div>
+    <div class="stat-card">
+      <h3>Total Houses</h3>
+      <p class="stat-number">{{ houseCount }}</p>
+    </div>
+    <div class="stat-card">
+      <h3>Total Repair Requests</h3>
+      <p class="stat-number">{{ repairRequestCount }}</p>
+    </div>
+    <div class="stat-card">
+      <h3>Pending Repair Requests</h3>
+      <p class="stat-number">{{ pendingRepairRequests }}</p>
+    </div>
+  </div>
+
+  <!-- User Management Section -->
+  <div class="user-management" *ngIf="!isLoading && !errorMessage">
+    <h2>User Management</h2>
+    <table class="user-table">
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{ user.id }}</td>
+        <td>{{ user.name }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.role }}</td>
+        <td>
+          <button (click)="deleteUser(user.id)" class="delete-btn">
+            Delete
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- House Management Section -->
+  <div class="house-management" *ngIf="!isLoading && !errorMessage">
+    <h2>House Management</h2>
+    <table class="house-table">
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Address</th>
+        <th>Owner Name</th>
+        <th>Owner Email</th>
+        <th>Number of Repair Requests</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let house of houses">
+        <td>{{ house.id }}</td>
+        <td>{{ house.address }}</td>
+        <td>{{ house.ownerName }}</td>
+        <td>{{ getUserEmail(house.ownerId) }}</td>
+        <td>{{ getRepairRequestsForHouse(house.id).length }}</td>
+        <td>
+          <button (click)="deleteHouse(house.id)" class="delete-btn">
+            Delete
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Repair Requests Management Section -->
+  <div class="repair-requests-management" *ngIf="!isLoading && !errorMessage">
+    <h2>Repair Requests Management</h2>
+    <table class="repair-requests-table">
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Description</th>
+        <th>House Address</th>
+        <th>Owner Name</th>
+        <th>Status</th>
+        <th>Created At</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let request of repairRequests">
+        <td>{{ request.id }}</td>
+        <td>{{ request.description }}</td>
+        <td>{{ getHouseAddress(request.houseId) }}</td>
+        <td>{{ getOwnerName(request.houseId) }}</td>
+        <td>{{ request.status }}</td>
+        <td>{{ request.createdAt | date:'medium' }}</td>
+<!--        <td>-->
+<!--          <button (click)="updateRepairRequestStatus(request.id, 'APPROVED')"-->
+<!--                  *ngIf="request.status === 'PENDING'"-->
+<!--                  class="approve-btn">-->
+<!--            Approve-->
+<!--          </button>-->
+<!--          <button (click)="updateRepairRequestStatus(request.id, 'REJECTED')"-->
+<!--                  *ngIf="request.status === 'PENDING'"-->
+<!--                  class="reject-btn">-->
+<!--            Reject-->
+<!--          </button>-->
+<!--        </td>-->
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -47,6 +47,21 @@
       </div>
     </div>
 
+    <!-- Phone Input -->
+    <div class="form-group">
+      <label for="phone">Phone Number (Optional):</label>
+      <input
+        id="phone"
+        type="tel"
+        formControlName="phone"
+        placeholder="10-digit phone number"
+        [class.invalid]="phone?.invalid && (phone?.dirty || phone?.touched)"
+      >
+      <div *ngIf="phone?.invalid && (phone?.dirty || phone?.touched)" class="error-messages">
+        <small *ngIf="phone?.errors?.['pattern']">Please enter a valid 10-digit phone number</small>
+      </div>
+    </div>
+
     <!-- Role Selection -->
     <div class="form-group">
       <label for="role">Role:</label>

@@ -2,94 +2,73 @@ package com.dakgoot.dakgoot.model;
 
 import jakarta.persistence.*;
 import java.util.List;
+import java.util.ArrayList;
 
-/**
- * Represents a house entity with an address, a resident, and multiple gutters.
- */
 @Entity
+@Table(name = "house")  // Explicitly name the table
 public class House {
-
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(nullable = false)
 	private String address;
 
-	@OneToOne(cascade = CascadeType.ALL)
-	private Resident resident;
+	// Update the relationship annotation
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "owner_id", nullable = false)
+	private User owner;
 
-	@OneToMany(cascade = CascadeType.ALL)
-	private List<Gutter> gutters;
+	// One-to-Many relationship with Repair Requests
+	@OneToMany(mappedBy = "house", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<RepairRequest> repairRequests = new ArrayList<>();
 
-	/**
-	 * Gets the ID of the house.
-	 *
-	 * @return the ID of the house
-	 */
+	// Constructors
+	public House() {}
+
+	public House(String address) {
+		this.address = address;
+	}
+
+	// Getters and Setters
 	public Long getId() {
 		return id;
 	}
 
-	/**
-	 * Sets the ID of the house.
-	 *
-	 * @param id the ID to set
-	 */
 	public void setId(Long id) {
 		this.id = id;
 	}
 
-	/**
-	 * Gets the address of the house.
-	 *
-	 * @return the address of the house
-	 */
 	public String getAddress() {
 		return address;
 	}
 
-	/**
-	 * Sets the address of the house.
-	 *
-	 * @param address the address to set
-	 */
 	public void setAddress(String address) {
 		this.address = address;
 	}
 
-	/**
-	 * Gets the resident of the house.
-	 *
-	 * @return the resident of the house
-	 */
-	public Resident getResident() {
-		return resident;
+	public User getOwner() {
+		return owner;
 	}
 
-	/**
-	 * Sets the resident of the house.
-	 *
-	 * @param resident the resident to set
-	 */
-	public void setResident(Resident resident) {
-		this.resident = resident;
+	public void setOwner(User owner) {
+		this.owner = owner;
 	}
 
-	/**
-	 * Gets the list of gutters associated with the house.
-	 *
-	 * @return the list of gutters
-	 */
-	public List<Gutter> getGutters() {
-		return gutters;
+	public List<RepairRequest> getRepairRequests() {
+		return repairRequests;
 	}
 
-	/**
-	 * Sets the list of gutters associated with the house.
-	 *
-	 * @param gutters the list of gutters to set
-	 */
-	public void setGutters(List<Gutter> gutters) {
-		this.gutters = gutters;
+	public void setRepairRequests(List<RepairRequest> repairRequests) {
+		this.repairRequests = repairRequests;
+	}
+
+	// Helper method to add a repair request
+	public void addRepairRequest(RepairRequest repairRequest) {
+		if (repairRequests == null) {
+			repairRequests = new ArrayList<>();
+		}
+		repairRequests.add(repairRequest);
+		repairRequest.setHouse(this);
 	}
 }

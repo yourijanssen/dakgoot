@@ -1,0 +1,67 @@
+<div class="homeowner-dashboard-container">
+  <div class="dashboard-header">
+    <h1>My Properties</h1>
+    <button
+      class="add-house-btn"
+      (click)="addNewHouse()"
+    >
+      Add New Property
+    </button>
+  </div>
+
+  <!-- Loading Indicator -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    <p>Loading your properties...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="error-message">
+    <p>{{ errorMessage }}</p>
+    <button (click)="refreshHouses()">Retry</button>
+  </div>
+
+  <!-- No Houses -->
+  <div
+    *ngIf="!isLoading && houses.length === 0 && !errorMessage"
+    class="no-houses-message"
+  >
+    <p>You don't have any properties yet.</p>
+    <button (click)="addNewHouse()">Add Your First Property</button>
+  </div>
+
+  <!-- Houses Grid -->
+  <div class="houses-grid">
+    <div
+      *ngFor="let house of houses"
+      class="house-card"
+    >
+      <div class="house-card-content" (click)="viewHouseDetails(house.id)">
+        <h3 class="house-address">{{ house.address }}</h3>
+
+        <div class="house-details">
+          <div class="detail-item">
+            <span class="label">Owner:</span>
+            <span class="value">{{ house.ownerName }}</span>
+          </div>
+
+          <div class="detail-item">
+            <span class="label">Repair Requests:</span>
+            <span class="value">
+<!--            {{ house.repairRequestCount || 0 }}-->
+          </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delete Button -->
+      <div class="house-card-actions">
+        <button
+          class="delete-house-btn"
+          (click)="deleteHouse(house.id)"
+        >
+          Delete House
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

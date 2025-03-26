@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import { Router } from '@angular/router';
-import {AuthService} from "../../services/auth-service/auth-service.service";
+import {MainService} from "../../services/main.service";
 
 
 @Component({
@@ -14,7 +14,7 @@ export class LogoutComponent implements OnInit {
   errorMessage: string = '';
 
   constructor(
-    private authService: AuthService,
+    private mainService: MainService,
     private router: Router
   ) {}
 
@@ -23,7 +23,7 @@ export class LogoutComponent implements OnInit {
   }
 
   performLogout() {
-    this.authService.logout().subscribe({
+    this.mainService.logout().subscribe({
       next: (response) => {
         // Logout successful, navigate to login page
         this.router.navigate(['/login']);
@@ -34,7 +34,7 @@ export class LogoutComponent implements OnInit {
         console.error('Logout error', error);
 
         // Even if there's an error, try to clear local user data
-        this.authService.clearCurrentUser();
+        this.mainService.clearCurrentUser();
         this.router.navigate(['/login']);
       }
     });

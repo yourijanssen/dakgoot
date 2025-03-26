@@ -1,20 +1,20 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from "../../services/auth-service/auth-service.service";
+import { MainService, UserRole } from "../../services/main.service";
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   errorMessage: string = '';
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService,
+    private mainService: MainService,
     private router: Router
   ) {
     this.loginForm = this.fb.group({
@@ -25,17 +25,17 @@ export class LoginComponent {
       password: ['', [
         Validators.required,
         Validators.minLength(6),
-        // Optional: Add more password complexity validators
-        // Validators.pattern(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/)
       ]]
     });
   }
 
-  /**
-   * Check if a form field is invalid and touched/dirty
-   * @param fieldName Name of the form control
-   * @returns Boolean indicating field validity
-   */
+  ngOnInit() {
+    // Check if user is already logged in
+    if (this.mainService.isLoggedIn()) {
+      this.navigateBasedOnRole();
+    }
+  }
+
   isFieldInvalid(fieldName: string): boolean {
     const field = this.loginForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
@@ -49,16 +49,39 @@ export class LoginComponent {
       // Clear any previous error messages
       this.errorMessage = '';
 
-      this.authService.login(this.loginForm.value).subscribe({
+      this.mainService.login(this.loginForm.value).subscribe({
         next: (response) => {
           if (response.success) {
-            this.router.navigate(['/']);
+            this.navigateBasedOnRole();
+          } else {
+            this.errorMessage = response.message;
           }
         },
         error: (error) => {
           this.errorMessage = error.message || 'Login failed';
         }
       });
+    }
+  }
+
+  private navigateBasedOnRole() {
+    const user = this.mainService.getCurrentUser();
+
+    if (user) {
+      switch (user.role) {
+        case UserRole.ADMIN:
+          this.router.navigate(['/admin-dashboard']);
+          break;
+        case UserRole.HOMEOWNER:
+          this.router.navigate(['/home']);
+          break;
+        case UserRole.MAINTENANCE:
+          // Add specific routing for maintenance role if needed
+          this.router.navigate(['/']);
+          break;
+        default:
+          this.router.navigate(['/login']);
+      }
     }
   }
 }

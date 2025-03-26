@@ -1,34 +1,79 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { HouseListComponent } from './components/house-list-component/house-list.component';
-import { HouseDetailComponent } from './components/house-detail-component/house-detail.component';
-import {HouseCreateComponent} from "./components/house-create/house-create.component";
-import {HouseUpdateComponent} from "./components/house-update/house-update.component";
-import {LoginComponent} from "./components/login/login.component";
-import {LogoutComponent} from "./components/logout/logout.component";
-import {RegisterComponent} from "./components/register/register.component";
-import {UserListComponent} from "./components/user-list/user-list.component";
+import { NgModule, Injectable } from '@angular/core';
+import { RouterModule, Routes, Router } from '@angular/router';
+import { LoginComponent } from "./components/login/login.component";
+import { LogoutComponent } from "./components/logout/logout.component";
+import { RegisterComponent } from "./components/register/register.component";
+import { AdminDashboardComponent } from "./components/admin-dashboard/admin-dashboard.component";
+import { HomeownerDashboardComponent } from "./components/homeowner-dashboard/homeowner-dashboard.component";
+import { MainService } from "./services/main.service";
+import { CanActivate } from '@angular/router';
 import {AuthGuard} from "./services/auth.guard";
 
-const routes: Routes = [
+@Injectable({
+  providedIn: 'root'
+})
+export class RoleBasedRedirectGuard implements CanActivate {
+  constructor(
+    private mainService: MainService,
+    private router: Router
+  ) {}
 
+  canActivate(): boolean {
+    const user = this.mainService.getCurrentUser();
+
+    if (user) {
+      switch (user.role) {
+        case 'ADMIN':
+          this.router.navigate(['/admin-dashboard']);
+          return false;
+        case 'HOMEOWNER':
+          this.router.navigate(['/home']);
+          return false;
+        default:
+          this.router.navigate(['/login']);
+          return false;
+      }
+    }
+
+    // Not logged in, allow navigation to login
+    this.router.navigate(['/login']);
+    return false;
+  }
+}
+
+const routes: Routes = [
   {
     path: '',
-    component: HouseListComponent,
-    canActivate: [AuthGuard] // Protect this route
+    canActivate: [RoleBasedRedirectGuard],
+    component: HomeownerDashboardComponent
   },
-  { path: 'house/:id', component: HouseDetailComponent },
-  { path: 'create-house', component: HouseCreateComponent },
-  { path: 'update-house/:id', component: HouseUpdateComponent },
-  { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
-  { path: 'logout', component: LogoutComponent },
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
-  { path: 'users', component: UserListComponent }
+  {
+    path: 'login',
+    component: LoginComponent
+  },
+  {
+    path: 'register',
+    component: RegisterComponent
+  },
+  {
+    path: 'logout',
+    component: LogoutComponent
+  },
+  {
+    path: 'admin-dashboard',
+    component: AdminDashboardComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'home',
+    component: HomeownerDashboardComponent,
+    canActivate: [AuthGuard]
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
+  providers: [RoleBasedRedirectGuard]
 })
 export class AppRoutingModule { }

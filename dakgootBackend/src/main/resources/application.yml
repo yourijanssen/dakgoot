@@ -1,12 +1,15 @@
 server:
   port: 8090
 
+
+
 spring:
   jpa:
     database: POSTGRESQL
     show-sql: false
     hibernate:
       ddl-auto: update
+
   datasource:
     url: jdbc:postgresql://localhost:5432/springbootdb
     username: postgres
